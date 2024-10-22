@@ -4,7 +4,7 @@ use petgraph::graph::NodeIndex;
 use crate::image_structs::RgbColor;
 use crate::image_structs::MyImage;
 
-pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u32), NodeIndex>, NodeIndex, NodeIndex) {
+pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u32), NodeIndex>, HashMap<NodeIndex, (u32, u32)>, NodeIndex, NodeIndex) {
     let mut graph = Graph::<u32, u32>::new();
     let width = img.width;
     let height = img.height;
@@ -118,5 +118,5 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
         }
     }
 
-    (graph, position_to_node, start.unwrap(), end.unwrap())
+    (graph, position_to_node, node_to_position, start.unwrap(), end.unwrap())
 }

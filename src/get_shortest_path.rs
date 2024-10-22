@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 
-pub(crate) fn get_shortest_path(graph: &Graph<u32, u32>, position_to_node: &HashMap<(u32, u32), NodeIndex>, start: NodeIndex, end: NodeIndex) -> Option<(i32, Vec<NodeIndex>)> {
+pub(crate) fn get_shortest_path(graph: Graph<u32, u32>, position_to_node: HashMap<(u32, u32), NodeIndex>, start: NodeIndex, end: NodeIndex) -> Option<(i32, Vec<NodeIndex>)> {
     // find the shortest path
     let start_pos = position_to_node.iter().find(|(_, v)| **v == start).unwrap().0;
     let end_pos = position_to_node.iter().find(|(_, v)| **v == end).unwrap().0;
