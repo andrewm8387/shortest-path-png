@@ -1,3 +1,5 @@
+use num_traits::FloatConst;
+use num_traits::cast::FromPrimitive;
 use std::collections::HashMap;
 use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
@@ -97,6 +99,46 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                     match position_to_node.get(&(x, y + 1)) {
                         Some(down) => {
                             graph.add_edge(node, *down, *graph.node_weight(*down).unwrap());
+                        }
+                        None => {
+                            // do nothing
+                        }
+                    }
+                }
+                if x > 0 && y > 0 {
+                    match position_to_node.get(&(x - 1, y - 1)) {
+                        Some(up_left) => {
+                            graph.add_edge(node, *up_left, u32::from_f64(f64::round(f64::from(*graph.node_weight(*up_left).unwrap()) * f64::SQRT_2())).unwrap());
+                        }
+                        None => {
+                            // do nothing
+                        }
+                    }
+                }
+                if x < width - 1 && y > 0 {
+                    match position_to_node.get(&(x + 1, y - 1)) {
+                        Some(up_right) => {
+                            graph.add_edge(node, *up_right, u32::from_f64(f64::round(f64::from(*graph.node_weight(*up_right).unwrap()) * f64::SQRT_2())).unwrap());
+                        }
+                        None => {
+                            // do nothing
+                        }
+                    }
+                }
+                if x > 0 && y < height - 1 {
+                    match position_to_node.get(&(x - 1, y + 1)) {
+                        Some(down_left) => {
+                            graph.add_edge(node, *down_left, u32::from_f64(f64::round(f64::from(*graph.node_weight(*down_left).unwrap()) * f64::SQRT_2())).unwrap());
+                        }
+                        None => {
+                            // do nothing
+                        }
+                    }
+                }
+                if x < width - 1 && y < height - 1 {
+                    match position_to_node.get(&(x + 1, y + 1)) {
+                        Some(down_right) => {
+                            graph.add_edge(node, *down_right, u32::from_f64(f64::round(f64::from(*graph.node_weight(*down_right).unwrap()) * f64::SQRT_2())).unwrap());
                         }
                         None => {
                             // do nothing
