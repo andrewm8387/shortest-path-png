@@ -1,22 +1,21 @@
 use num_traits::FloatConst;
-use num_traits::cast::FromPrimitive;
 use std::collections::HashMap;
 use petgraph::graph::Graph;
 use petgraph::graph::NodeIndex;
 use crate::image_structs::RgbColor;
 use crate::image_structs::MyImage;
 
-pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u32), NodeIndex>, HashMap<NodeIndex, (u32, u32)>, NodeIndex, NodeIndex) {
-    let mut graph = Graph::<u32, u32>::new();
-    let width = img.width;
-    let height = img.height;
-    let mut position_to_node: HashMap<(u32, u32), NodeIndex> = HashMap::new();
-    let mut node_to_position: HashMap<NodeIndex, (u32, u32)> = HashMap::new();
+pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u64, u64>, HashMap<(u64, u64), NodeIndex>, HashMap<NodeIndex, (u64, u64)>, NodeIndex, NodeIndex) {
+    let mut graph = Graph::<u64, u64>::new();
+    let width = img.width as u64;
+    let height = img.height as u64;
+    let mut position_to_node: HashMap<(u64, u64), NodeIndex> = HashMap::new();
+    let mut node_to_position: HashMap<NodeIndex, (u64, u64)> = HashMap::new();
     let mut start = None;
     let mut end = None;
     for x in 0..width {
         for y in 0..height {
-            match img.get_pixel(x, y).color {
+            match img.get_pixel(x as u32, y as u32).color {
                 RgbColor::GREEN => {
                     let id = graph.add_node(100);
                     position_to_node.insert((x, y), id);
@@ -29,7 +28,7 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                     node_to_position.insert(id, (x,y));
                     end = Some(id);
                 }
-                RgbColor::BLACK | RgbColor::OLIVE => {
+                RgbColor::BLACK | RgbColor::OLIVE | RgbColor::PURPLE => {
                     // do nothing
                 }
                 RgbColor::UNDEFINED | RgbColor::YELLOW | RgbColor::LIGHT_BROWN | RgbColor::GREY => {
@@ -38,22 +37,22 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                     node_to_position.insert(id, (x,y));
                 }
                 RgbColor::WHITE | RgbColor::LIGHT_YELLOW => {
-                    let id = graph.add_node(80);
+                    let id = graph.add_node(125);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                 }
                 RgbColor::LIGHT_GREEN => {
-                    let id = graph.add_node(60);
+                    let id = graph.add_node(167);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                 }
                 RgbColor::MEDIUM_GREEN => {
-                    let id = graph.add_node(40);
+                    let id = graph.add_node(333);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                 }
                 RgbColor::DARK_GREEN => {
-                    let id = graph.add_node(20);
+                    let id = graph.add_node(1000);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                 }
@@ -108,7 +107,7 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                 if x > 0 && y > 0 {
                     match position_to_node.get(&(x - 1, y - 1)) {
                         Some(up_left) => {
-                            graph.add_edge(node, *up_left, u32::from_f64(f64::round(f64::from(*graph.node_weight(*up_left).unwrap()) * f64::SQRT_2())).unwrap());
+                            graph.add_edge(node, *up_left, (*graph.node_weight(*up_left).unwrap() as f64 * f64::SQRT_2()) as u64);
                         }
                         None => {
                             // do nothing
@@ -118,7 +117,7 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                 if x < width - 1 && y > 0 {
                     match position_to_node.get(&(x + 1, y - 1)) {
                         Some(up_right) => {
-                            graph.add_edge(node, *up_right, u32::from_f64(f64::round(f64::from(*graph.node_weight(*up_right).unwrap()) * f64::SQRT_2())).unwrap());
+                            graph.add_edge(node, *up_right, (*graph.node_weight(*up_right).unwrap() as f64 * f64::SQRT_2()) as u64);
                         }
                         None => {
                             // do nothing
@@ -128,7 +127,7 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                 if x > 0 && y < height - 1 {
                     match position_to_node.get(&(x - 1, y + 1)) {
                         Some(down_left) => {
-                            graph.add_edge(node, *down_left, u32::from_f64(f64::round(f64::from(*graph.node_weight(*down_left).unwrap()) * f64::SQRT_2())).unwrap());
+                            graph.add_edge(node, *down_left, (*graph.node_weight(*down_left).unwrap() as f64 * f64::SQRT_2()) as u64);
                         }
                         None => {
                             // do nothing
@@ -138,7 +137,7 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
                 if x < width - 1 && y < height - 1 {
                     match position_to_node.get(&(x + 1, y + 1)) {
                         Some(down_right) => {
-                            graph.add_edge(node, *down_right, u32::from_f64(f64::round(f64::from(*graph.node_weight(*down_right).unwrap()) * f64::SQRT_2())).unwrap());
+                            graph.add_edge(node, *down_right, (*graph.node_weight(*down_right).unwrap() as f64 * f64::SQRT_2()) as u64);
                         }
                         None => {
                             // do nothing
@@ -183,27 +182,21 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
     (graph, position_to_node, node_to_position, start.unwrap(), end.unwrap())
 }
 
-pub(crate) fn graph_to_heatmap(graph: &Graph<u32, u32>, position_to_node: &HashMap<(u32, u32), NodeIndex>, width: u32, height: u32) {
+pub(crate) fn graph_to_heatmap(graph: &Graph<u64, u64>, position_to_node: &HashMap<(u64, u64), NodeIndex>, width: u64, height: u64) {
     // create a heatmap of the speeds
-    let mut img = image::RgbImage::new(width, height);
+    let mut img = image::RgbImage::new(width as u32, height as u32);
     for x in 0..width {
         for y in 0..height {
             match position_to_node.get(&(x, y)) {
                 Some(node) => {
                     let speed = *graph.node_weight(*node).unwrap();
-                    let color = match speed {
-                        100 => image::Rgb([255, 255, 255]),
-                        80 => image::Rgb([204, 204, 204]),
-                        60 => image::Rgb([153, 153, 153]),
-                        40 => image::Rgb([102, 102, 102]),
-                        20 => image::Rgb([51, 51, 51]),
-                        _ => image::Rgb([0, 0, 0])
-                    };
-                    img.put_pixel(x, y, color);
+                    let val  = (25500.0 / speed as f64) as u8;
+                    let color = image::Rgb([val, val, val]);
+                    img.put_pixel(x as u32, y as u32, color);
                 }
                 None => {
                     let color = image::Rgb([0, 0, 0]);
-                    img.put_pixel(x, y, color);
+                    img.put_pixel(x as u32, y as u32, color);
                 }
             }
         }

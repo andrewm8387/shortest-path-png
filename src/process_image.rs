@@ -22,13 +22,13 @@ pub(crate) fn get_image(file_path: &str) -> MyImage {
     }
 }
 
-pub fn add_path_to_image(path: Vec<NodeIndex>, node_to_position: HashMap<NodeIndex, (u32, u32)>, file_path: &str) -> () {
+pub fn add_path_to_image(path: Vec<NodeIndex>, node_to_position: HashMap<NodeIndex, (u64, u64)>, file_path: &str) -> () {
     let mut img = image::open(file_path).unwrap();
     for node in path {
         let position = node_to_position.get(&node).unwrap();
         let x = position.0;
         let y = position.1;
-        img.put_pixel(x, y, image::Rgb([0, 0, 255]).to_rgba());
+        img.put_pixel(x as u32, y as u32, image::Rgb([0, 0, 255]).to_rgba());
     }
     // save the image
     img.save("output.png").expect("fuck");
