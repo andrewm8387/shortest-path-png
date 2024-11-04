@@ -16,22 +16,42 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
         for y in 0..height {
             match img.get_pixel(x, y).color {
                 RgbColor::GREEN => {
-                    let id = graph.add_node(1);
+                    let id = graph.add_node(100);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                     start = Some(id);
                 }
                 RgbColor::RED => {
-                    let id = graph.add_node(1);
+                    let id = graph.add_node(100);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                     end = Some(id);
                 }
-                RgbColor::BLACK => {
+                RgbColor::BLACK | RgbColor::OLIVE => {
                     // do nothing
                 }
-                RgbColor::UNDEFINED => {
-                    let id = graph.add_node(1);
+                RgbColor::UNDEFINED | RgbColor::YELLOW | RgbColor::LIGHT_BROWN | RgbColor::GREY => {
+                    let id = graph.add_node(100);
+                    position_to_node.insert((x, y), id);
+                    node_to_position.insert(id, (x,y));
+                }
+                RgbColor::WHITE | RgbColor::LIGHT_YELLOW => {
+                    let id = graph.add_node(80);
+                    position_to_node.insert((x, y), id);
+                    node_to_position.insert(id, (x,y));
+                }
+                RgbColor::LIGHT_GREEN => {
+                    let id = graph.add_node(60);
+                    position_to_node.insert((x, y), id);
+                    node_to_position.insert(id, (x,y));
+                }
+                RgbColor::MEDIUM_GREEN => {
+                    let id = graph.add_node(40);
+                    position_to_node.insert((x, y), id);
+                    node_to_position.insert(id, (x,y));
+                }
+                RgbColor::DARK_GREEN => {
+                    let id = graph.add_node(20);
                     position_to_node.insert((x, y), id);
                     node_to_position.insert(id, (x,y));
                 }
@@ -117,6 +137,34 @@ pub(crate) fn image_to_graph(img: MyImage) -> (Graph<u32, u32>, HashMap<(u32, u3
             end = Some(default_end);
         }
     }
-
+    graph_to_heatmap(&graph, &position_to_node, width, height);
     (graph, position_to_node, node_to_position, start.unwrap(), end.unwrap())
+}
+
+pub(crate) fn graph_to_heatmap(graph: &Graph<u32, u32>, position_to_node: &HashMap<(u32, u32), NodeIndex>, width: u32, height: u32) {
+    // create a heatmap of the speeds
+    let mut img = image::RgbImage::new(width, height);
+    for x in 0..width {
+        for y in 0..height {
+            match position_to_node.get(&(x, y)) {
+                Some(node) => {
+                    let speed = *graph.node_weight(*node).unwrap();
+                    let color = match speed {
+                        100 => image::Rgb([255, 255, 255]),
+                        80 => image::Rgb([204, 204, 204]),
+                        60 => image::Rgb([153, 153, 153]),
+                        40 => image::Rgb([102, 102, 102]),
+                        20 => image::Rgb([51, 51, 51]),
+                        _ => image::Rgb([0, 0, 0])
+                    };
+                    img.put_pixel(x, y, color);
+                }
+                None => {
+                    let color = image::Rgb([0, 0, 0]);
+                    img.put_pixel(x, y, color);
+                }
+            }
+        }
+    }
+    img.save("heatmap.png").expect("fuck")
 }
