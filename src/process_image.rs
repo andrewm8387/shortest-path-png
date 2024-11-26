@@ -33,3 +33,14 @@ pub fn add_path_to_image(path: Vec<NodeIndex>, node_to_position: HashMap<NodeInd
     // save the image
     img.save("output.png").expect("fuck");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_image() {
+        let file_path = "test/test.png";
+        get_image(file_path);
+    }
+}

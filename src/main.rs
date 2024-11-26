@@ -24,7 +24,7 @@ fn main() {
     let (graph, position_to_node, node_to_position, start, end) = image_to_graph::image_to_graph(img);
     // get shortest path
     println!("Calculating shortest path");
-    let path = get_shortest_path::get_shortest_path(graph, position_to_node, &node_to_position, start, end);
+    let path = get_shortest_path::get_shortest_path(graph, position_to_node, start, end);
     // print path
     match path {
         Some((distance, path)) => {
